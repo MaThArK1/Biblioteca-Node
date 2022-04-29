@@ -1,4 +1,7 @@
-console.log('Vamos começar!');
+//const chalk = import('chalk')
+import chalk from "chalk";
+
+console.log(chalk.blue('Vamos começar!'));
 
 const paragrafo = 'Texto retornado por uma função';
 
