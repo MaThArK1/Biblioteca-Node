@@ -1,47 +1,28 @@
-//const chalk = require('chalk')
-import chalk from "chalk";
-import fs from "fs";
+const chalk = require('chalk');
+const fs = require('fs');
 
-function trataErro(erro){
-    throw new Error(chalk.red(erro.code, 'Não foi possível encontrar o arquivo!'));
+function extraiLinks(texto) {
+  const regex = /\[([^\]]*)\]\((https?:\/\/[^$#\s].[^\s]*)\)/gm;
+  const arrayResultados = [];
+  let temp;
+  while((temp = regex.exec(texto)) !== null) {
+    arrayResultados.push({ [temp[1]]: temp[2] })
+  }
+  return arrayResultados.length === 0 ? 'não há links' : arrayResultados;
 }
 
-function pegaArquivo(caminhoDoArquivo) {
-    const encoding = 'utf-8';
-    fs.promises
-        .readFile(caminhoDoArquivo, encoding)
-        .then((texto) => console.log(chalk.green(texto)))
-        .catch((erro) => trataErro(erro)) ;
-    
+function trataErro(erro) {
+  throw new Error(chalk.red(erro.code, 'não há arquivo no caminho'));
 }
 
-/* function pegaArquivo(caminhoDoArquivo) {
-    const encoding = 'utf-8';
-    fs.readFile(caminhoDoArquivo, encoding, (erro, texto) => {
-        if (erro) {
-            trataErro(erro);
-        }
-        console.log(chalk.green(texto));
-    })
-} */
+async function pegaArquivo(caminhoDoArquivo) {
+  const encoding = 'utf-8';
+  try {
+    const texto = await fs.promises.readFile(caminhoDoArquivo, encoding)
+    return extraiLinks(texto);
+  } catch(erro) {
+    trataErro(erro);
+  }
+}
 
-pegaArquivo('./arquivos/texto1.md');
-
-//const chalk = require('chalk');
-//const fs = require('fs');
-//
-////encadear métodos para colorir texto, cor de fundo e texto em negrito
-//console.log(chalk.blue.bgWhite.bold('Alura'));
-//
-////receber múltiplos argumentos
-//console.log(chalk.blue('curso', 'de', 'NodeJS'));
-//
-////métodos aninhados
-//console.log(chalk.red('vermelho', chalk.underline.bgBlue('azul')));
-//
-//// uso de template strings e placeholders
-//console.log(`
-//CPU: ${chalk.red('90%')}
-//RAM: ${chalk.green('40%')}
-//DISK: ${chalk.yellow('70%')}
-//`);
+module.exports = pegaArquivo;
